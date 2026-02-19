@@ -18,12 +18,21 @@ st.sidebar.info("Este MVP processa PDFs e utiliza o Gemini para classificação.
 uploaded_file = st.file_uploader("Carregue o documento PDF (Petição, Contrato, etc.)", type="pdf")
 
 if uploaded_file is not None:
-    # Salva temporariamente o arquivo na pasta data/ para o processador ler
-    caminho_temp = os.path.join("data", uploaded_file.name)
-    with open(caminho_temp, "wb") as f:
-        f.write(uploaded_file.getbuffer())
+    # 1. Garante que a pasta 'data' existe (Essencial para o Deploy)
+    if not os.path.exists("data"):
+        os.makedirs("data")
 
-    st.success(f"Arquivo '{uploaded_file.name}' carregado com sucesso!")
+    # 2. Define o caminho e salva
+    caminho_temp = os.path.join("data", uploaded_file.name)
+    
+    try:
+        with open(caminho_temp, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+        st.success(f"Arquivo '{uploaded_file.name}' carregado!")
+    except Exception as e:
+        st.error(f"Erro ao salvar arquivo temporário: {e}")
+
+    
 
     # 2. Botão para Iniciar Processamento
     if st.button("Analisar Documento"):
